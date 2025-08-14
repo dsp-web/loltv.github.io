@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSP AI Chatbot</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
+    header {
+        background: #03055B;
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .chat-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        overflow-y: auto;
+    }
+    .message {
+        max-width: 70%;
+        margin-bottom: 12px;
+        padding: 10px 15px;
+        border-radius: 10px;
+        line-height: 1.4;
+    }
+    .user {
+        background: #03055B;
+        color: white;
+        align-self: flex-end;
+    }
+    .bot {
+        background: white;
+        color: black;
+        border: 1px solid #ddd;
+        align-self: flex-start;
+    }
+    .input-container {
+        display: flex;
+        padding: 10px;
+        background: white;
+        border-top: 1px solid #ccc;
+    }
+    input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        outline: none;
+    }
+    button {
+        margin-left: 10px;
+        padding: 10px 15px;
+        background: #03055B;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+    button:hover {
+        background: #020344;
+    }
+</style>
+</head>
+<body>
+
+<header>🤖 DSP AI Chatbot</header>
+
+<div class="chat-container" id="chat-container">
+    <div class="message bot">Hello! I'm DSP AI. How can I help you today?</div>
+</div>
+
+<div class="input-container">
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    const chatContainer = document.getElementById("chat-container");
+
+    function addMessage(text, sender) {
+        const messageEl = document.createElement("div");
+        messageEl.classList.add("message", sender);
+        messageEl.innerText = text;
+        chatContainer.appendChild(messageEl);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById("user-input");
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMessage(text, "user");
+        input.value = "";
+
+        try {
+            const response = await fetch("http://localhost:3000/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+            if (data.reply) {
+                addMessage(data.reply, "bot");
+            } else {
+                addMessage("⚠️ Error from server.", "bot");
+            }
+        } catch (error) {
+            addMessage("⚠️ Error connecting to AI server.", "bot");
+            console.error(error);
+        }
+    }
+
+    document.getElementById("user-input").addEventListener("keypress", function (e) {
+        if (e.key === "Enter") sendMessage();
+    });
+</script>
+
+</body>
+</html>

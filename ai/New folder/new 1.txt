@@ -1,0 +1,7 @@
+dsp-chatbot/
+│
+├── api/
+│   └── chat.js        ← this will be your backend
+├── index.html         ← your chatbot HTML file
+├── package.json
+├── .env               ← your OpenAI API key
